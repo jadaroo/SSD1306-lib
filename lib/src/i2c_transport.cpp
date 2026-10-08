@@ -1,5 +1,6 @@
-#include "../include/i2c_bus/i2c_transport.hpp"
+#include "i2c_bus/i2c_transport.hpp"
 #include "i2c_bus/bus.hpp"
+#include "commands.hpp"
 #include <cstddef>
 #include <cstdint>
 #include <cstring>

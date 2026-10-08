@@ -1,8 +1,6 @@
-#include "../include/display/display.hpp"
-#include "i2c_bus/bus.hpp"
 #include "i2c_bus/i2c_transport.hpp"
+#include "display/display.hpp"
 #include "glcdfont.hpp"
-#include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <iostream>
@@ -71,7 +69,7 @@ void DISPLAY::clear_display(){
 void DISPLAY::add_rect(RECT &rect){
   for(uint8_t i = rect.pos_.second; i < (rect.pos_.second + rect.height_); i++){
     for(uint8_t j = rect.pos_.first; j < (rect.pos_.first + rect.width_); j++){
-      set_pixel({j, i});
+     set_pixel({j, i});
     }
   }
 }

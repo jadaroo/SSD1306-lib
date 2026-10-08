@@ -1,32 +1,33 @@
 cmake_minimum_required(VERSION 3.13)
 
-set(PICO_BOARD pico_w)
-include(pico_sdk_import.cmake)
+# Built on its own (cmake -S .) vs. pulled in by another project via
+# add_subdirectory(). In the second case the parent owns the Pico SDK setup.
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    set(SSD1306_IS_TOP_LEVEL ON)
+else()
+    set(SSD1306_IS_TOP_LEVEL OFF)
+endif()
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+if(SSD1306_IS_TOP_LEVEL)
+    set(PICO_BOARD pico_w)
+    include(pico_sdk_import.cmake)
+endif()
 
 project(SSD1306 C CXX ASM)
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_CXX_STANDARD 17)
 
-pico_sdk_init()
+if(SSD1306_IS_TOP_LEVEL)
+    set(CMAKE_C_STANDARD 11)
+    set(CMAKE_CXX_STANDARD 17)
+    set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+    pico_sdk_init()
+endif()
 
-add_executable(${PROJECT_NAME}
-    main.cpp
-    src/i2c_transport.cpp
-    src/display.cpp
-)
+option(SSD1306_BUILD_EXAMPLES "Build the SSD1306 example programs" ${SSD1306_IS_TOP_LEVEL})
 
-target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_CURRENT_LIST_DIR}/include
-)
+# The driver itself: a reusable library target (ssd1306::ssd1306)
+add_subdirectory(lib)
 
-target_link_libraries(${PROJECT_NAME}
-    pico_stdlib
-    hardware_i2c
-)
-
-pico_enable_stdio_usb(${PROJECT_NAME} 1)
-pico_enable_stdio_uart(${PROJECT_NAME} 0)
-
-pico_add_extra_outputs(${PROJECT_NAME})
+# Example / test programs that use the library
+if(SSD1306_BUILD_EXAMPLES)
+    add_subdirectory(examples)
+endif()

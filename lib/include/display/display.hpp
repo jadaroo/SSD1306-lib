@@ -1,7 +1,7 @@
 #pragma once
 
-#include "display/rectangle.hpp"
-#include "display/strings.hpp"
+#include "rectangle.hpp"
+#include "strings.hpp"
 #include "i2c_bus/i2c_transport.hpp"
 #include <cstdint>
 #include <utility>
