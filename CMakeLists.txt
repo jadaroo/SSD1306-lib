@@ -13,8 +13,8 @@ pico_sdk_init()
 
 add_executable(${PROJECT_NAME}
     main.cpp
-    include/i2c_bus/i2c_transport.cpp
-    include/display/display.cpp
+    src/i2c_transport.cpp
+    src/display.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE

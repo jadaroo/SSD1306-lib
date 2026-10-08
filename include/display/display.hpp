@@ -6,6 +6,18 @@
 #include <cstdint>
 #include <utility>
 
+constexpr uint8_t glyph_width = 5; //	font property
+constexpr uint8_t glyph_height = 8; // 	font property
+constexpr uint8_t page_height = 8; 
+constexpr uint8_t char_advance = 7;
+constexpr uint8_t line_advance = 9;
+constexpr uint8_t display_on = 0xA4;
+constexpr uint8_t disp_normal = 0xAF;
+constexpr uint8_t enable_charge_pump[2] = {0x8D, 0b00010100};
+constexpr uint8_t set_hor_mem_mode[2] = {0x20, 0x20};
+constexpr uint8_t disp_height = 64;
+constexpr uint8_t disp_width = 128;
+
 class DISPLAY{
   public:
     DISPLAY(I2CTRANSPORT *i2c);
