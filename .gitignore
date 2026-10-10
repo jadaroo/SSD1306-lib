@@ -1,4 +1,3 @@
 build*/
 .zed
 .clangd
-main.cpp
