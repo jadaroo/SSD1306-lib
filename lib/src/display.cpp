@@ -6,7 +6,6 @@
 #include <cstdint>
 #include <cstring>
 #include <iostream>
-#include <utility>
 
 DISPLAY::DISPLAY(I2CTRANSPORT *i2c) : i2c_(i2c){}
 
@@ -23,8 +22,8 @@ namespace {
     }
   }
 
-  bool out_of_bounce(std::pair<uint8_t, uint8_t> pos){
-    return ((pos.first >= disp_width) || (pos.second >= disp_width));
+  bool out_of_bounce(Point pos){
+    return ((pos.first < 0) || (pos.second < 0) || (pos.first >= disp_width) || (pos.second >= disp_width));
   }
 };
 
@@ -41,7 +40,7 @@ void DISPLAY::init_disp(){
   }
 }
 
-void DISPLAY::set_pixel(std::pair<uint8_t, uint8_t> pixel){
+void DISPLAY::set_pixel(Point pixel){
   if(out_of_bounce(pixel)) return;
   uint8_t page = pixel.second / page_height;
   size_t byte_idx = (page * disp_width) + pixel.first;
@@ -50,7 +49,7 @@ void DISPLAY::set_pixel(std::pair<uint8_t, uint8_t> pixel){
   display_[byte_idx] |= (1 << bit);
 }
 
-void DISPLAY::clear_pixel(std::pair<uint8_t, uint8_t> pixel){
+void DISPLAY::clear_pixel(Point pixel){
   if(out_of_bounce(pixel)) return;
   uint8_t page = pixel.second / page_height;
   uint16_t byte_idx = (page * disp_width) + pixel.first;
@@ -69,7 +68,7 @@ void DISPLAY::clear_display(){
   memset(display_, 0, 1024);
 }
 
-void DISPLAY::add_char(std::pair<uint8_t, uint8_t> pos, char symbol){
+void DISPLAY::add_char(Point pos, char symbol){
   size_t char_idx = symbol * glyph_width;
   for(size_t i = char_idx; i < char_idx + glyph_width; i++){
     uint8_t column = font[i];
@@ -81,7 +80,7 @@ void DISPLAY::add_char(std::pair<uint8_t, uint8_t> pos, char symbol){
   }
 }
 
-void DISPLAY::delete_char(std::pair<uint8_t, uint8_t> pos, char symbol){
+void DISPLAY::delete_char(Point pos, char symbol){
   size_t char_idx = symbol * glyph_width;
   for(size_t i = char_idx; i < char_idx + glyph_width; i++){
     uint8_t column = font[i];
@@ -94,7 +93,7 @@ void DISPLAY::delete_char(std::pair<uint8_t, uint8_t> pos, char symbol){
 }
 
 void DISPLAY::add_string(SSD1306::String &string){
-  std::pair<uint8_t, uint8_t> char_pos = string.point_;
+  Point char_pos = string.point_;
   for(const auto& elem : string.string_){
     add_char(char_pos, elem);
     if(char_pos.first <= disp_width - char_advance) char_pos.first += char_advance;
@@ -106,7 +105,7 @@ void DISPLAY::add_string(SSD1306::String &string){
 }
 
 void DISPLAY::delete_string(SSD1306::String &string){
-  std::pair<uint8_t, uint8_t> char_pos = string.point_;
+  Point char_pos = string.point_;
   for(const auto& elem : string.string_){
     delete_char(char_pos, elem);
     if(char_pos.first <= disp_width - char_advance) char_pos.first += char_advance;

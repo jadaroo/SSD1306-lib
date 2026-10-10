@@ -4,7 +4,8 @@
 #include <cstdint>
 #include <utility>
 
-SSD1306::Circle::Circle(std::pair<uint8_t, uint8_t> center_pos, uint8_t rad) : Figure(center_pos), rad_(rad){}
+
+SSD1306::Circle::Circle(Point center_pos, uint8_t rad) : Figure(center_pos), rad_(rad){}
 
 namespace {
   void draw_horizontal_line(uint8_t px1, uint8_t px2, uint8_t y, DISPLAY &display){
@@ -116,13 +117,13 @@ void SSD1306::Circle::delete_figure(DISPLAY &display){
   }
 }
 
-void SSD1306::Circle::move_to(std::pair<uint8_t, uint8_t> new_pos, DISPLAY &display){
+void SSD1306::Circle::move_to(Point new_pos, DISPLAY &display){
   delete_figure(display);
   set_pos(new_pos);
   draw(display);
 }
 
-void SSD1306::Circle::move_by(std::pair<uint8_t, uint8_t> shift, DISPLAY &display){
-  std::pair<uint8_t, uint8_t> new_pos = {pos().first + shift.first, pos().second + shift.second};
+void SSD1306::Circle::move_by(Point shift, DISPLAY &display){
+  Point new_pos = {pos().first + shift.first, pos().second + shift.second};
   move_to(new_pos, display);
 }
