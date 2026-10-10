@@ -1,3 +1,6 @@
+#include "display/rectangle.hpp"
+#include "display/strings.hpp"
+#include "i2c_bus/bus.hpp"
 #include "i2c_bus/i2c_transport.hpp"
 #include "display/display.hpp"
 #include "glcdfont.hpp"
@@ -19,7 +22,7 @@ namespace {
     } else {
       std::cout << "UB" << "\n";
     }
-  } 
+  }
 
   bool out_of_bounce(std::pair<uint8_t, uint8_t> pos){
     return ((pos.first >= disp_width) || (pos.second >= disp_width));
@@ -45,7 +48,7 @@ void DISPLAY::set_pixel(std::pair<uint8_t, uint8_t> pixel){
   size_t byte_idx = (page * disp_width) + pixel.first;
   uint8_t bit = pixel.second % 8;
 
-  display_[byte_idx] |= (1 << bit); 
+  display_[byte_idx] |= (1 << bit);
 }
 
 void DISPLAY::clear_pixel(std::pair<uint8_t, uint8_t> pixel){
@@ -58,7 +61,8 @@ void DISPLAY::clear_pixel(std::pair<uint8_t, uint8_t> pixel){
 }
 
 void DISPLAY::print_data(){
-  i2c_->write_data(display_);
+  Status operation = i2c_->write_data(display_);
+  error_check(operation);
   disp_on();
 }
 
@@ -66,7 +70,7 @@ void DISPLAY::clear_display(){
   memset(display_, 0, 1024);
 }
 
-void DISPLAY::add_rect(RECT &rect){
+void DISPLAY::add_rect(SSD1306::Rect &rect){
   for(uint8_t i = rect.pos_.second; i < (rect.pos_.second + rect.height_); i++){
     for(uint8_t j = rect.pos_.first; j < (rect.pos_.first + rect.width_); j++){
      set_pixel({j, i});
@@ -74,7 +78,7 @@ void DISPLAY::add_rect(RECT &rect){
   }
 }
 
-void DISPLAY::delete_rect(RECT &rect){
+void DISPLAY::delete_rect(SSD1306::Rect &rect){
   for(uint8_t i = rect.pos_.second; i < (rect.pos_.second + rect.height_); i++){
     for(uint8_t j = rect.pos_.first; j < (rect.pos_.first + rect.width_); j++){
       clear_pixel({j, i});
@@ -106,11 +110,11 @@ void DISPLAY::delete_char(std::pair<uint8_t, uint8_t> pos, char symbol){
   }
 }
 
-void DISPLAY::add_string(String &string){
+void DISPLAY::add_string(SSD1306::String &string){
   std::pair<uint8_t, uint8_t> char_pos = string.point_;
   for(const auto& elem : string.string_){
     add_char(char_pos, elem);
-    if(char_pos.first <= disp_width - char_advance) char_pos.first += char_advance;  
+    if(char_pos.first <= disp_width - char_advance) char_pos.first += char_advance;
     if(char_pos.first > disp_width - char_advance){
       char_pos.first = 1;
       char_pos.second += line_advance;
@@ -118,11 +122,11 @@ void DISPLAY::add_string(String &string){
   }
 }
 
-void DISPLAY::delete_string(String &string){
+void DISPLAY::delete_string(SSD1306::String &string){
   std::pair<uint8_t, uint8_t> char_pos = string.point_;
   for(const auto& elem : string.string_){
     delete_char(char_pos, elem);
-    if(char_pos.first <= disp_width - char_advance) char_pos.first += char_advance;  
+    if(char_pos.first <= disp_width - char_advance) char_pos.first += char_advance;
     if(char_pos.first > disp_width - char_advance){
       char_pos.first = 1;
       char_pos.second += line_advance;

@@ -22,14 +22,14 @@ class DISPLAY{
   public:
     DISPLAY(I2CTRANSPORT *i2c);
     void init_disp();
-    void add_rect(RECT &rect);
-    void delete_rect(RECT &rect);
+    void add_rect(SSD1306::Rect &rect);
+    void delete_rect(SSD1306::Rect &rect);
     void clear_display();
     void print_data();
     void set_pixel(std::pair<uint8_t, uint8_t> pixel);
     void clear_pixel(std::pair<uint8_t, uint8_t> pixel);
-    void add_string(String &string);
-    void delete_string(String &string);
+    void add_string(SSD1306::String &string);
+    void delete_string(SSD1306::String &string);
   private:
     uint8_t display_[1024]{0};
     I2CTRANSPORT *i2c_;
