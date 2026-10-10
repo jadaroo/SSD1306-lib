@@ -1,6 +1,8 @@
 add_library(ssd1306 STATIC
     src/display.cpp
     src/i2c_transport.cpp
+    src/circle.cpp
+    src/rect.cpp
 )
 add_library(ssd1306::ssd1306 ALIAS ssd1306)
 

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "rectangle.hpp"
 #include "strings.hpp"
 #include "i2c_bus/i2c_transport.hpp"
 #include <cstdint>
@@ -22,8 +21,6 @@ class DISPLAY{
   public:
     DISPLAY(I2CTRANSPORT *i2c);
     void init_disp();
-    void add_rect(SSD1306::Rect &rect);
-    void delete_rect(SSD1306::Rect &rect);
     void clear_display();
     void print_data();
     void set_pixel(std::pair<uint8_t, uint8_t> pixel);

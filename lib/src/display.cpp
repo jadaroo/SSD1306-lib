@@ -1,4 +1,3 @@
-#include "display/rectangle.hpp"
 #include "display/strings.hpp"
 #include "i2c_bus/bus.hpp"
 #include "i2c_bus/i2c_transport.hpp"
@@ -68,22 +67,6 @@ void DISPLAY::print_data(){
 
 void DISPLAY::clear_display(){
   memset(display_, 0, 1024);
-}
-
-void DISPLAY::add_rect(SSD1306::Rect &rect){
-  for(uint8_t i = rect.pos_.second; i < (rect.pos_.second + rect.height_); i++){
-    for(uint8_t j = rect.pos_.first; j < (rect.pos_.first + rect.width_); j++){
-     set_pixel({j, i});
-    }
-  }
-}
-
-void DISPLAY::delete_rect(SSD1306::Rect &rect){
-  for(uint8_t i = rect.pos_.second; i < (rect.pos_.second + rect.height_); i++){
-    for(uint8_t j = rect.pos_.first; j < (rect.pos_.first + rect.width_); j++){
-      clear_pixel({j, i});
-    }
-  }
 }
 
 void DISPLAY::add_char(std::pair<uint8_t, uint8_t> pos, char symbol){
