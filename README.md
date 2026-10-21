@@ -65,7 +65,7 @@ int main() {
   DISPLAY display(&i2c);
   display.init_disp();
 
-  SSD1306::String hello("Hello, SSD1306!", {12, 28});
+  SSD1306::String hello({12, 28}, "Hello, SSD1306!", 15); // position, text, length
   display.add_string(hello);  // draws into the RAM framebuffer
   display.print_data();       // sends it to the panel
 
@@ -91,17 +91,21 @@ Coordinates are `Point = std::pair<int16_t, int16_t>`: `{x, y}`, where `{0, 0}` 
 | `set_pixel(p)` / `clear_pixel(p)` | Single pixel. Points off screen are ignored. |
 | `fill_hor_line(x0, x1, y)` / `clear_hor_line(x0, x1, y)` | Horizontal line from `x0` to `x1` (inclusive), clipped to the screen. |
 | `add_string(s)` / `delete_string(s)` | Draws or erases an `SSD1306::String`. |
+| `change_string(s, text, len)` | Erases `s`, replaces its text and draws it again. |
 
 ### Text: `SSD1306::String`
 
 ```cpp
-SSD1306::String title("Hello", {1, 0});  // text, top-left position
+SSD1306::String title({1, 0}, "Hello", 5);  // top-left position, text, length
 display.add_string(title);
+
+display.change_string(title, "Hi", 2);     // erase old text, draw new
 ```
 
 - Each character takes 7 pixels across and each line 9 pixels down, so a line holds 18 characters. Longer text wraps onto the next line.
-- `String` stores a `std::string_view`: it **does not copy** the text. The characters must stay alive as long as the `String` is used.
-- To change text, call `delete_string` while the buffer still holds the old text, then write the new text and call `add_string`. `examples/text_example` shows this with a live counter.
+- `String` **copies** the text into its own buffer, so the source can be a temporary, e.g. a local buffer filled by `snprintf`.
+- Text can be at most `SSD1306::max_string_len` (168) characters. Longer text is rejected with a message on stdio: the constructor leaves the string empty, and `change_string` leaves it unchanged.
+- `change_string` handles text of any length, shorter or longer than before. `examples/text_example` uses it for a live counter.
 
 ### Figures: `SSD1306::Rect`, `SSD1306::Circle`
 
@@ -141,7 +145,7 @@ The animator keeps a reference to its figure, so the figure must outlive it.
 
 | Example | Shows |
 |---------|-------|
-| [`text_example`](examples/text_example/main.cpp) | A title, a long string that wraps on its own, and an uptime counter updated every second. |
+| [`text_example`](examples/text_example/main.cpp) | A title, a long string that wraps on its own, and text replaced every second with `change_string`: a status line that changes length and an uptime counter. |
 | [`bouncing_ball_example`](examples/bouncing_ball_example/main.cpp) | A ball bouncing inside a frame made of rectangles at a steady 50 FPS. |
 
 The I2C setup the examples share is in [`examples/common/example_board.hpp`](examples/common/example_board.hpp).
