@@ -5,12 +5,12 @@
 #include "i2c_bus/bus.hpp"
 #include "i2c_bus/i2c_transport.hpp"
 #include <cstdint>
+#include <cstdio>
 #include <cstring>
-#include <iostream>
 
 DISPLAY::DISPLAY(I2CTRANSPORT *i2c) : i2c_(i2c) {
   if(i2c_ == nullptr) {
-    std::cout << "DISPLAY: i2c transport is nullptr" << "\n";
+    printf("DISPLAY: i2c transport is nullptr\n");
   }
 }
 
@@ -20,15 +20,15 @@ bool error_check(Status operation, const char *where) {
     return true;
   }
 
-  std::cout << where << ": ";
+  printf("%s: ", where);
   if(operation == Status::NACK) {
-    std::cout << "NACK" << "\n";
+    printf("NACK\n");
   } else if(operation == Status::TIMEOUT) {
-    std::cout << "TIMEOUT" << "\n";
+    printf("TIMEOUT\n");
   } else if(operation == Status::ERROR) {
-    std::cout << "ERROR" << "\n";
+    printf("ERROR\n");
   } else {
-    std::cout << "unknown status " << +static_cast<uint8_t>(operation) << "\n";
+    printf("unknown status %u\n", static_cast<uint8_t>(operation));
   }
   return false;
 }
@@ -51,7 +51,7 @@ void DISPLAY::mark_dirty(uint8_t page) {
 
 void DISPLAY::disp_on() {
   if(i2c_ == nullptr) {
-    std::cout << "disp_on: i2c transport is nullptr" << "\n";
+    printf("disp_on: i2c transport is nullptr\n");
     return;
   }
   error_check(i2c_->write_command(&display_on, 1), "disp_on");
@@ -59,7 +59,7 @@ void DISPLAY::disp_on() {
 
 void DISPLAY::init_disp() {
   if(i2c_ == nullptr) {
-    std::cout << "init_disp: i2c transport is nullptr" << "\n";
+    printf("init_disp: i2c transport is nullptr\n");
     return;
   }
   error_check(i2c_->write_command(enable_charge_pump, 2), "init_disp: charge pump");
@@ -108,7 +108,7 @@ void DISPLAY::clear_hor_line(int16_t x0, int16_t x1, int16_t y) {
 
 void DISPLAY::print_data() {
   if(i2c_ == nullptr) {
-    std::cout << "print_data: i2c transport is nullptr" << "\n";
+    printf("print_data: i2c transport is nullptr\n");
     return;
   }
   for(uint8_t i = 0; i < 8; i++) {
@@ -120,7 +120,7 @@ void DISPLAY::print_data() {
       if(error_check(i2c_->write_page(i, data), "print_data")) {
         dirty_ &= ~(1U << i);
       } else {
-        std::cout << "print_data: page " << +i << " not sent" << "\n";
+        printf("print_data: page %u not sent\n", i);
       }
     }
   }
@@ -128,14 +128,14 @@ void DISPLAY::print_data() {
 
 void DISPLAY::clear_display() {
   if(i2c_ == nullptr) {
-    std::cout << "clear_display: i2c transport is nullptr" << "\n";
+    printf("clear_display: i2c transport is nullptr\n");
     return;
   }
   for(uint8_t i = 0; i < 8; i++) {
     uint8_t data[128];
     memset(data, 0, 128);
     if(!error_check(i2c_->write_page(i, data), "clear_display")) {
-      std::cout << "clear_display: page " << +i << " not cleared" << "\n";
+      printf("clear_display: page %u not cleared\n", i);
     }
   }
 }
@@ -143,7 +143,7 @@ void DISPLAY::clear_display() {
 void DISPLAY::add_char(Point pos, char symbol) {
   size_t char_idx = static_cast<uint8_t>(symbol) * glyph_width;
   if(char_idx + glyph_width > sizeof(font)) {
-    std::cout << "unsupported char code " << +static_cast<uint8_t>(symbol) << "\n";
+    printf("unsupported char code %u\n", static_cast<uint8_t>(symbol));
     return;
   }
   for(size_t i = char_idx; i < char_idx + glyph_width; i++) {
@@ -159,7 +159,7 @@ void DISPLAY::add_char(Point pos, char symbol) {
 void DISPLAY::delete_char(Point pos, char symbol) {
   size_t char_idx = static_cast<uint8_t>(symbol) * glyph_width;
   if(char_idx + glyph_width > sizeof(font)) {
-    std::cout << "unsupported char code " << +static_cast<uint8_t>(symbol) << "\n";
+    printf("unsupported char code %u\n", static_cast<uint8_t>(symbol));
     return;
   }
   for(size_t i = char_idx; i < char_idx + glyph_width; i++) {
@@ -200,7 +200,7 @@ void DISPLAY::delete_string(SSD1306::String &string) {
 
 void DISPLAY::change_string(SSD1306::String &string, const char *new_string, uint8_t len) {
   if(len > max_string_len) {
-    std::cout << "Too long string" << "\n";
+    printf("Too long string\n");
     return;
   }
   delete_string(string);

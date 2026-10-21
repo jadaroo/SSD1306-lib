@@ -1,8 +1,8 @@
 #pragma once
 
 #include "point.hpp"
+#include <cstdio>
 #include <cstring>
-#include <iostream>
 
 constexpr uint8_t max_string_len = 168;
 
@@ -12,7 +12,7 @@ struct String
 {
   String(Point point, const char *string, uint8_t len) : point_(point) {
     if(len > max_string_len) {
-      std::cout << "Too long string" << "\n";
+      printf("Too long string\n");
       return;
     }
     memcpy(string_, string, len);
