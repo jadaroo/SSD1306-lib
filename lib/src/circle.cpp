@@ -3,125 +3,101 @@
 #include "figure/figure.hpp"
 #include <cstdint>
 
-SSD1306::Circle::Circle(Point center_pos, uint8_t rad) : Figure(center_pos), rad_(rad){}
+SSD1306::Circle::Circle(Point center_pos, uint8_t rad) : Figure(center_pos), rad_(rad) {}
 
-namespace {
-  void draw_horizontal_line(uint8_t px1, uint8_t px2, uint8_t y, DISPLAY &display){
-    for(uint8_t i = px1; i <= px2; i++){
-      display.set_pixel({i, y});
-    }
-  }
+// Midpoint circle algorithm, filled with horizontal spans.
+// The display clips each line, so the circle may be partly off screen.
+void SSD1306::Circle::draw(DISPLAY &display) {
+  int16_t cx = pos().first;
+  int16_t cy = pos().second;
 
-  void delete_horizontal_line(uint8_t px1, uint8_t px2, uint8_t y, DISPLAY &display){
-    for(uint8_t i = px1; i <= px2; i++){
-      display.clear_pixel({i, y});
-    }
-  }
-};
-
-void SSD1306::Circle::draw(DISPLAY &display){
+  // x and y are offsets from the centre, so they are never negative
   uint8_t x = rad_;
   uint8_t y = 0;
 
-  // Printing the initial point on the axes
-  // after translation
-  display.set_pixel({x + pos().first, y + pos().second});
-
-  // When radius is zero only a single
-  // point will be printed
-  if (rad_ > 0) {
-    display.set_pixel({x + pos().first, -y + pos().second});
-    display.set_pixel({y + pos().first, x + pos().second});
-    display.set_pixel({-y + pos().first, x + pos().second});
-
-    draw_horizontal_line(-x + pos().first, x + pos().first, y + pos().second, display);
-  }
+  // Centre row plus the top and bottom points on the vertical axis
+  display.fill_hor_line(cx - x, cx + x, cy);
+  display.fill_hor_line(cx, cx, cy - x);
+  display.fill_hor_line(cx, cx, cy + x);
 
   // Initialising the value of P
   auto decision = 1 - rad_;
-  while (x > y){
+  while(x > y) {
     y++;
 
     // Mid-point is inside or on the perimeter
-    if (decision <= 0){
+    if(decision <= 0) {
       decision = decision + (2 * y) + 1;
-    } else{ // Mid-point is outside the perimeter
+    } else { // Mid-point is outside the perimeter
       x--;
       decision = decision + (2 * y) - (2 * x) + 1;
     }
 
     // All the perimeter points have already been printed
-    if (x < y) break;
+    if(x < y) break;
 
-    // Printing the generated point and its reflection
-    // in the other octants after translation
-    draw_horizontal_line(-x + pos().first, x + pos().first, y + pos().second, display);
-    draw_horizontal_line(-x + pos().first, x + pos().first, -y + pos().second, display);
-    
+    // Rows above and below the centre, reflected across the octants
+    display.fill_hor_line(cx - x, cx + x, cy + y);
+    display.fill_hor_line(cx - x, cx + x, cy - y);
+
     // If the generated point is on the line x = y then
-    // the perimeter points have already been printed
-    if (x != y){
-      draw_horizontal_line(-y + pos().first, y + pos().first, x + pos().second, display);
-      draw_horizontal_line(-y + pos().first, y + pos().first, -x + pos().second, display);
+    // these rows have already been printed
+    if(x != y) {
+      display.fill_hor_line(cx - y, cx + y, cy + x);
+      display.fill_hor_line(cx - y, cx + y, cy - x);
     }
   }
 }
 
-void SSD1306::Circle::delete_figure(DISPLAY &display){
+void SSD1306::Circle::delete_figure(DISPLAY &display) {
+  int16_t cx = pos().first;
+  int16_t cy = pos().second;
+
+  // x and y are offsets from the centre, so they are never negative
   uint8_t x = rad_;
   uint8_t y = 0;
 
-  // Printing the initial point on the axes
-  // after translation
-  display.clear_pixel({x + pos().first, y + pos().second});
-
-  // When radius is zero only a single
-  // point will be printed
-  if (rad_ > 0) {
-    display.clear_pixel({x + pos().first, -y + pos().second});
-    display.clear_pixel({y + pos().first, x + pos().second});
-    display.clear_pixel({-y + pos().first, x + pos().second});
-
-    delete_horizontal_line(-x + pos().first, x + pos().first, y + pos().second, display);
-  }
+  // Centre row plus the top and bottom points on the vertical axis
+  display.clear_hor_line(cx - x, cx + x, cy);
+  display.clear_hor_line(cx, cx, cy - x);
+  display.clear_hor_line(cx, cx, cy + x);
 
   // Initialising the value of P
   auto decision = 1 - rad_;
-  while (x > y){
+  while(x > y) {
     y++;
 
     // Mid-point is inside or on the perimeter
-    if (decision <= 0){
+    if(decision <= 0) {
       decision = decision + (2 * y) + 1;
-    } else{ // Mid-point is outside the perimeter
+    } else { // Mid-point is outside the perimeter
       x--;
       decision = decision + (2 * y) - (2 * x) + 1;
     }
 
     // All the perimeter points have already been printed
-    if (x < y) break;
+    if(x < y) break;
 
-    // Printing the generated point and its reflection
-    // in the other octants after translation
-    delete_horizontal_line(-x + pos().first, x + pos().first, y + pos().second, display);
-    delete_horizontal_line(-x + pos().first, x + pos().first, -y + pos().second, display);
-    
+    // Rows above and below the centre, reflected across the octants
+    display.clear_hor_line(cx - x, cx + x, cy + y);
+    display.clear_hor_line(cx - x, cx + x, cy - y);
+
     // If the generated point is on the line x = y then
-    // the perimeter points have already been printed
-    if (x != y){
-      delete_horizontal_line(-y + pos().first, y + pos().first, x + pos().second, display);
-      delete_horizontal_line(-y + pos().first, y + pos().first, -x + pos().second, display);
+    // these rows have already been printed
+    if(x != y) {
+      display.clear_hor_line(cx - y, cx + y, cy + x);
+      display.clear_hor_line(cx - y, cx + y, cy - x);
     }
   }
 }
 
-void SSD1306::Circle::move_to(Point new_pos, DISPLAY &display){
+void SSD1306::Circle::move_to(Point new_pos, DISPLAY &display) {
   delete_figure(display);
   set_pos(new_pos);
   draw(display);
 }
 
-void SSD1306::Circle::move_by(Point shift, DISPLAY &display){
+void SSD1306::Circle::move_by(Point shift, DISPLAY &display) {
   Point new_pos = {pos().first + shift.first, pos().second + shift.second};
   move_to(new_pos, display);
 }

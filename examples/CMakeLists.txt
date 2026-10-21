@@ -2,6 +2,8 @@
 # with USB stdio and the usual .uf2/.hex/.bin outputs.
 #
 #   ssd1306_add_example(<name> <sources>...)
+set(SSD1306_EXAMPLES_COMMON_DIR ${CMAKE_CURRENT_LIST_DIR}/common)
+
 function(ssd1306_add_example name)
     add_executable(${name} ${ARGN})
 
@@ -9,6 +11,9 @@ function(ssd1306_add_example name)
         PRIVATE
             ssd1306::ssd1306
     )
+
+    # Shared board setup (example_board.hpp)
+    target_include_directories(${name} PRIVATE ${SSD1306_EXAMPLES_COMMON_DIR})
 
     pico_enable_stdio_usb(${name} 1)
     pico_enable_stdio_uart(${name} 0)
