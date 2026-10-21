@@ -2,8 +2,6 @@
 #include "display/display.hpp"
 #include "figure/figure.hpp"
 #include <cstdint>
-#include <utility>
-
 
 SSD1306::Circle::Circle(Point center_pos, uint8_t rad) : Figure(center_pos), rad_(rad){}
 

@@ -1,6 +1,8 @@
-#include "figure/circle.hpp"
+#include "animator/animator.hpp"
+#include "figure/rect.hpp"
 #include "i2c_bus/i2c_transport.hpp"
 #include "display/display.hpp"
+#include <boards/pico_w.h>
 #include <hardware/gpio.h>
 #include <hardware/irq.h>
 #include <hardware/regs/intctrl.h>
@@ -34,20 +36,17 @@ int main(){
 
   display.init_disp();
   
-  SSD1306::Circle circle({10, 10}, 10);
-  circle.draw(display);
-  display.print_data();
+  SSD1306::Rect rect({0, 0}, 10, 10);
+  rect.draw(display);
   
-  while(circle.pos().first != 110 && circle.pos().second != 50){
-    while(circle.pos().second != 50){
-      circle.move_by({0, 10}, display);
-      display.print_data();
-      sleep_ms(70);
-    }
-    circle.move_to({circle.pos().first + 10, 10}, display);
-  }
+  display.print_data();
+
+  SSD1306::Animator rect_animator(rect, display);
+  rect_animator.move_animated({117, 0}, 50000);
   
   while (true) { 
-    tight_loop_contents();
+    absolute_time_t now = get_absolute_time();
+    rect_animator.update(now);
+    display.print_data();
   }
 }

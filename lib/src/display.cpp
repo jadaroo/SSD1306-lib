@@ -61,7 +61,6 @@ void DISPLAY::clear_pixel(Point pixel){
 void DISPLAY::print_data(){
   Status operation = i2c_->write_data(display_);
   error_check(operation);
-  disp_on();
 }
 
 void DISPLAY::clear_display(){

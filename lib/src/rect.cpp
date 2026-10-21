@@ -2,7 +2,6 @@
 #include "display/display.hpp"
 #include "figure/figure.hpp"
 #include <cstdint>
-#include <utility>
 
 SSD1306::Rect::Rect(Point pos, uint8_t height, uint8_t width) : Figure(pos), height_(height), width_(width){}
 

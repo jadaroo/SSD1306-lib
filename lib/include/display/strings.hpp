@@ -1,9 +1,7 @@
 #pragma once
 
-#include <cstdint>
 #include <string_view>
 #include "point.hpp"
-#include <utility>
 
 namespace SSD1306{
   struct String {

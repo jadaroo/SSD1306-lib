@@ -13,7 +13,6 @@ namespace SSD1306 {
       void move_to(Point new_pos, DISPLAY &display) override;
       void move_by(Point shift, DISPLAY &display) override;
       void delete_figure(DISPLAY &display) override;
-      void move_animated(Point new_pos, DISPLAY &display) override;
     private:
       uint8_t rad_;
   };
