@@ -26,13 +26,11 @@ public:
   void print_data();
   void set_pixel(Point pixel);
   void clear_pixel(Point pixel);
-  // Set / clear the pixels x0..x1 (inclusive) in row y,
-  // clipped to the screen. Off-screen parts are skipped.
   void fill_hor_line(int16_t x0, int16_t x1, int16_t y);
   void clear_hor_line(int16_t x0, int16_t x1, int16_t y);
   void add_string(SSD1306::String &string);
   void delete_string(SSD1306::String &string);
-
+  void change_string(SSD1306::String &string, const char *new_string, uint8_t len);
 private:
   uint8_t display_[1024]{0};
   uint8_t dirty_ = 0;

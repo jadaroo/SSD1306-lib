@@ -174,8 +174,8 @@ void DISPLAY::delete_char(Point pos, char symbol) {
 
 void DISPLAY::add_string(SSD1306::String &string) {
   Point char_pos = string.point_;
-  for(const auto &elem : string.string_) {
-    add_char(char_pos, elem);
+  for(uint8_t i = 0; i < string.len_; i++) {
+    add_char(char_pos, string.string_[i]);
     if(char_pos.first <= disp_width - char_advance)
       char_pos.first += char_advance;
     if(char_pos.first > disp_width - char_advance) {
@@ -187,8 +187,8 @@ void DISPLAY::add_string(SSD1306::String &string) {
 
 void DISPLAY::delete_string(SSD1306::String &string) {
   Point char_pos = string.point_;
-  for(const auto &elem : string.string_) {
-    delete_char(char_pos, elem);
+  for(uint8_t i = 0; i < string.len_; i++) {
+    delete_char(char_pos, string.string_[i]);
     if(char_pos.first <= disp_width - char_advance)
       char_pos.first += char_advance;
     if(char_pos.first > disp_width - char_advance) {
@@ -196,4 +196,15 @@ void DISPLAY::delete_string(SSD1306::String &string) {
       char_pos.second += line_advance;
     }
   }
+}
+
+void DISPLAY::change_string(SSD1306::String &string, const char *new_string, uint8_t len) {
+  if(len > max_string_len) {
+    std::cout << "Too long string" << "\n";
+    return;
+  }
+  delete_string(string);
+  memcpy(string.string_, new_string, len);
+  string.len_ = len;
+  add_string(string);
 }

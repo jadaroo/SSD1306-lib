@@ -1,13 +1,13 @@
 // Text rendering: a static title, a long string that wraps on its own,
-// and a value that is redrawn once per second.
+// and text that is replaced once per second.
 
 #include "display/display.hpp"
 #include "display/strings.hpp"
 #include "example_board.hpp"
 #include "i2c_bus/i2c_transport.hpp"
 #include <cstdio>
+#include <cstring>
 #include <pico/stdlib.h>
-#include <string_view>
 
 int main() {
   stdio_init_all();
@@ -17,26 +17,32 @@ int main() {
   DISPLAY display(&i2c);
   display.init_disp();
 
-  SSD1306::String title("== TEXT DEMO ==", {12, 0});
+  // String copies the text into its own buffer
+  SSD1306::String title({12, 0}, "== TEXT DEMO ==", 15);
   display.add_string(title);
 
   // Text that runs past the right edge continues on the next line
-  SSD1306::String paragraph("Long strings wrap to the next line on their own.", {1, 12});
+  const char *paragraph_text = "Long strings wrap to the next line on their own.";
+  SSD1306::String paragraph({1, 12}, paragraph_text, strlen(paragraph_text));
   display.add_string(paragraph);
 
-  // String only references its characters, so the buffer must outlive it
-  char uptime_text[20];
-  SSD1306::String uptime("", {1, 48});
+  // Start empty, the loop fills them in
+  SSD1306::String status({1, 42}, "", 0);
+  SSD1306::String uptime({1, 54}, "", 0);
 
   uint32_t seconds = 0;
   absolute_time_t next_tick = get_absolute_time();
   while(true) {
-    // Erase the old value while its buffer still holds the old characters
-    display.delete_string(uptime);
+    // change_string erases the old text first, so the new one may be shorter
+    if(seconds % 2 == 0) {
+      display.change_string(status, "State: tick", 11);
+    } else {
+      display.change_string(status, "State: tock!!", 13);
+    }
 
+    char uptime_text[20];
     int len = snprintf(uptime_text, sizeof(uptime_text), "Uptime: %lu s", static_cast<unsigned long>(seconds));
-    uptime = SSD1306::String(std::string_view(uptime_text, len), {1, 48});
-    display.add_string(uptime);
+    display.change_string(uptime, uptime_text, len);
 
     // Only the pages that changed are sent
     display.print_data();
