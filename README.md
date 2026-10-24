@@ -67,7 +67,7 @@ int main() {
 
   SSD1306::String hello({12, 28}, "Hello, SSD1306!", 15); // position, text, length
   display.add_string(hello);  // draws into the RAM framebuffer
-  display.print_data();       // sends it to the panel
+  display.update_display();       // sends it to the panel
 
   while(true) {
     tight_loop_contents();
@@ -75,7 +75,7 @@ int main() {
 }
 ```
 
-Drawing functions only change the framebuffer. Nothing shows up until you call `print_data()`, which sends just the 8-pixel-high pages that changed since the last call.
+Drawing functions only change the framebuffer. Nothing shows up until you call `update_display()`, which sends just the 8-pixel-high pages that changed since the last call.
 
 ## API overview
 
@@ -86,7 +86,7 @@ Coordinates are `Point = std::pair<int16_t, int16_t>`: `{x, y}`, where `{0, 0}` 
 | Function | Description |
 |----------|-------------|
 | `init_disp()` | Turns the panel on and clears it. Call once. |
-| `print_data()` | Sends changed pages to the panel. |
+| `update_display()` | Sends changed pages to the panel. |
 | `clear_display()` | Blanks the panel. |
 | `set_pixel(p)` / `clear_pixel(p)` | Single pixel. Points off screen are ignored. |
 | `fill_hor_line(x0, x1, y)` / `clear_hor_line(x0, x1, y)` | Horizontal line from `x0` to `x1` (inclusive), clipped to the screen. |
@@ -129,7 +129,7 @@ anim.move_animated({100, 10}, 10000);  // target, µs per one-pixel step
 
 while(true) {
   anim.update(get_absolute_time());
-  display.print_data();
+  display.update_display();
 }
 ```
 

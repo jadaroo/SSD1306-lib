@@ -55,7 +55,7 @@ int main() {
 
   SSD1306::Circle ball({disp_width / 2, disp_height / 2}, radius);
   ball.draw(display);
-  display.print_data();
+  display.update_display();
 
   int16_t velocity_x = 2;
   int16_t velocity_y = 1;
@@ -67,7 +67,7 @@ int main() {
                   bounce(pos.second, velocity_y, min_y, max_y)};
 
     ball.move_to(next, display);
-    display.print_data();
+    display.update_display();
 
     // sleep_until keeps a steady frame rate regardless of how long drawing took
     next_frame = delayed_by_ms(next_frame, frame_time_ms);

@@ -23,7 +23,7 @@ public:
   DISPLAY(I2CTRANSPORT *i2c);
   void init_disp();
   void clear_display();
-  void print_data();
+  void update_display();
   void set_pixel(Point pixel);
   void clear_pixel(Point pixel);
   void fill_hor_line(int16_t x0, int16_t x1, int16_t y);

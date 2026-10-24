@@ -106,9 +106,9 @@ void DISPLAY::clear_hor_line(int16_t x0, int16_t x1, int16_t y) {
   }
 }
 
-void DISPLAY::print_data() {
+void DISPLAY::update_display() {
   if(i2c_ == nullptr) {
-    printf("print_data: i2c transport is nullptr\n");
+    printf("update_display: i2c transport is nullptr\n");
     return;
   }
   for(uint8_t i = 0; i < 8; i++) {
@@ -117,10 +117,10 @@ void DISPLAY::print_data() {
       uint16_t page_index = i * page_size;
       memcpy(data, &display_[page_index], page_size);
 
-      if(error_check(i2c_->write_page(i, data), "print_data")) {
+      if(error_check(i2c_->write_page(i, data), "update_display")) {
         dirty_ &= ~(1U << i);
       } else {
-        printf("print_data: page %u not sent\n", i);
+        printf("update_display: page %u not sent\n", i);
       }
     }
   }
@@ -142,7 +142,7 @@ void DISPLAY::clear_display() {
     }
   }
 
-  print_data();
+  update_display();
 }
 
 void DISPLAY::add_char(Point pos, char symbol) {

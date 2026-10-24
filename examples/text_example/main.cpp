@@ -45,7 +45,7 @@ int main() {
     display.change_string(uptime, uptime_text, len);
 
     // Only the pages that changed are sent
-    display.print_data();
+    display.update_display();
 
     seconds++;
     next_tick = delayed_by_ms(next_tick, 1000);
