@@ -13,7 +13,7 @@ void SSD1306::Rect::draw(DISPLAY &display) {
   }
 }
 
-void SSD1306::Rect::delete_figure(DISPLAY &display) {
+void SSD1306::Rect::clear_figure(DISPLAY &display) {
   if(width_ == 0) return;
 
   for(int16_t y = pos().second; y < pos().second + height_; y++) {
@@ -22,7 +22,7 @@ void SSD1306::Rect::delete_figure(DISPLAY &display) {
 }
 
 void SSD1306::Rect::move_to(Point new_pos, DISPLAY &display) {
-  delete_figure(display);
+  clear_figure(display);
   set_pos(new_pos);
   draw(display);
 }

@@ -49,7 +49,7 @@ void SSD1306::Circle::draw(DISPLAY &display) {
   }
 }
 
-void SSD1306::Circle::delete_figure(DISPLAY &display) {
+void SSD1306::Circle::clear_figure(DISPLAY &display) {
   int16_t cx = pos().first;
   int16_t cy = pos().second;
 
@@ -92,7 +92,7 @@ void SSD1306::Circle::delete_figure(DISPLAY &display) {
 }
 
 void SSD1306::Circle::move_to(Point new_pos, DISPLAY &display) {
-  delete_figure(display);
+  clear_figure(display);
   set_pos(new_pos);
   draw(display);
 }

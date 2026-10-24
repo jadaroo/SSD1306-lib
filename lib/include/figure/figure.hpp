@@ -11,7 +11,7 @@ public:
   virtual void draw(DISPLAY &display) = 0;
   virtual void move_to(Point new_pos, DISPLAY &display) = 0;
   virtual void move_by(Point shift, DISPLAY &display) = 0;
-  virtual void delete_figure(DISPLAY &display) = 0;
+  virtual void clear_figure(DISPLAY &display) = 0;
   Point pos() { return pos_; }
   void set_pos(Point new_pos) { pos_ = new_pos; }
   virtual ~Figure() = default;
