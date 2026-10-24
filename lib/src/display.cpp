@@ -33,7 +33,7 @@ bool error_check(Status operation, const char *where) {
   return false;
 }
 
-bool out_of_bounce(Point pos) {
+bool out_of_bounds(Point pos) {
   return ((pos.first < 0) || (pos.second < 0) || (pos.first >= disp_width) || (pos.second >= disp_height));
 }
 
@@ -69,7 +69,7 @@ void DISPLAY::init_disp() {
 }
 
 void DISPLAY::set_pixel(Point pixel) {
-  if(out_of_bounce(pixel))
+  if(out_of_bounds(pixel))
     return;
   uint8_t page = pixel.second / page_height;
   size_t byte_idx = (page * disp_width) + pixel.first;
@@ -81,7 +81,7 @@ void DISPLAY::set_pixel(Point pixel) {
 }
 
 void DISPLAY::clear_pixel(Point pixel) {
-  if(out_of_bounce(pixel))
+  if(out_of_bounds(pixel))
     return;
   uint8_t page = pixel.second / page_height;
   uint16_t byte_idx = (page * disp_width) + pixel.first;
@@ -133,11 +133,16 @@ void DISPLAY::clear_display() {
   }
   for(uint8_t i = 0; i < 8; i++) {
     uint8_t data[128];
+    memset(display_, 0, 1024);
     memset(data, 0, 128);
     if(!error_check(i2c_->write_page(i, data), "clear_display")) {
       printf("clear_display: page %u not cleared\n", i);
+    } else{
+      dirty_ = 0xFF;
     }
   }
+
+  print_data();
 }
 
 void DISPLAY::add_char(Point pos, char symbol) {
