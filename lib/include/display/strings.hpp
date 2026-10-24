@@ -4,7 +4,7 @@
 #include <cstdio>
 #include <cstring>
 
-constexpr uint8_t max_string_len = 168;
+constexpr uint8_t max_string_len = 126;
 
 namespace SSD1306 {
 
